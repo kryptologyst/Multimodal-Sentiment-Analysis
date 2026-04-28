@@ -1,0 +1,113 @@
+# Model configuration
+model:
+  name: "multimodal_sentiment_analysis"
+  text_encoder:
+    model_name: "distilbert-base-uncased"
+    max_length: 512
+    freeze_encoder: false
+  
+  audio_encoder:
+    feature_dim: 128
+    hidden_dim: 256
+    num_layers: 2
+    dropout: 0.1
+  
+  fusion:
+    method: "late_fusion"  # early_fusion, late_fusion, cross_attention
+    hidden_dim: 512
+    dropout: 0.2
+  
+  classifier:
+    num_classes: 3  # positive, negative, neutral
+    hidden_dim: 256
+    dropout: 0.3
+
+# Training configuration
+training:
+  batch_size: 32
+  learning_rate: 2e-5
+  num_epochs: 10
+  warmup_steps: 100
+  weight_decay: 0.01
+  gradient_clip_norm: 1.0
+  
+  # Mixed precision training
+  use_amp: true
+  
+  # Early stopping
+  patience: 3
+  min_delta: 0.001
+
+# Data configuration
+data:
+  dataset_name: "multimodal_sentiment"
+  max_audio_length: 10.0  # seconds
+  sample_rate: 16000
+  n_mels: 80
+  n_fft: 1024
+  hop_length: 256
+  
+  # Data splits
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  
+  # Augmentation
+  audio_augment:
+    noise_factor: 0.01
+    pitch_shift: 2
+    time_stretch: 0.1
+  
+  text_augment:
+    synonym_replacement: 0.1
+    random_insertion: 0.05
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - "accuracy"
+    - "macro_f1"
+    - "weighted_f1"
+    - "confusion_matrix"
+    - "classification_report"
+  
+  # Per-class metrics
+  per_class_metrics: true
+  
+  # Confidence calibration
+  calibration: true
+
+# Logging and tracking
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  save_predictions: true
+  
+  # TensorBoard
+  use_tensorboard: true
+  
+  # Optional: Weights & Biases
+  use_wandb: false
+  wandb_project: "multimodal-sentiment-analysis"
+
+# Device configuration
+device:
+  # Auto-detect: cuda -> mps -> cpu
+  auto_detect: true
+  device: "auto"
+  
+  # Deterministic training
+  deterministic: true
+  seed: 42
+
+# Paths
+paths:
+  data_dir: "data"
+  model_dir: "models"
+  output_dir: "outputs"
+  assets_dir: "assets"
+  
+  # Checkpointing
+  save_checkpoints: true
+  checkpoint_dir: "checkpoints"
+  save_best_only: true
